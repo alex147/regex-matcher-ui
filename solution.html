@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>NETB281 assignment</title>
+        <script type="text/javascript">
+            function runRegex() {
+                var regexAsText = document.getElementById("t1").value;
+                var originalText = document.getElementById("t2").value;
+
+                // remove all new line characters 
+                originalText = originalText.replace(/\r?\n|\r/g, " ")
+
+                // Add an extra space to the end of the text
+                // to avoid never-ending searches.
+                // This space is trimmed later.
+                var text = originalText + " ";
+
+                // find if there is a regex flag (like g, i, etc.)
+                var flagPattern = /\/.*\/(.)/g;
+                var matchedFlag = flagPattern.exec(regexAsText);
+                if (matchedFlag) {
+                   regexAsText = regexAsText.substr(0, regexAsText.length-1);
+                }
+
+                // remove any forward slashes
+                if (regexAsText.indexOf("/") !== -1) {
+                    regexAsText = regexAsText.replace(/\//g, "");
+                }
+
+                // return if either regex or text is empty
+                if (!regexAsText || !text) {
+                    document.getElementById("result").innerHTML = originalText;
+                    return;
+                }
+
+                var re;
+                if (matchedFlag) {
+                    re = new RegExp(regexAsText, matchedFlag[1]);
+                } else {
+                    re = new RegExp(regexAsText, "g");  
+                }
+                    
+                var replacedCount = 0;
+                var m = re.exec(originalText);
+                while (m && m[0]) {
+                    var replaceWith = "<u><b>" + m + "</b></u>"
+                    // 14 is the length in characters of opening and closing tags for bold and underline
+                    var substring = text.substr(m.index + 14*replacedCount);
+                    var replacedSubstring = substring.replace(m, replaceWith);
+                    text = text.replace(substring, replacedSubstring);
+
+                    m = re.exec(originalText);
+                    replacedCount++;
+                }
+
+                document.getElementById("result").innerHTML = text.trim();
+            }
+        </script>
+    </head>
+    <body>
+        <p>Please, enter the regex:</p>
+        <textarea id="t1" cols="50" rows="3" placeholder="Regex goes here..." autofocus="true" onkeyup="runRegex()"></textarea> <br/>
+
+        <p>Please, enter the text to match:</p>
+        <textarea id="t2" cols="150" rows="15"  placeholder="Text to match goes here..." onkeyup="runRegex()"></textarea>
+
+        <h3>Highlighted text:</h3>
+        <div id="result"></div>
+    </body>
+<html>
